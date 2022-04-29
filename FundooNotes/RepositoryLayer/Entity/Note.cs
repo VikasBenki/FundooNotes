@@ -22,6 +22,7 @@ namespace RepositoryLayer.Entity
         public bool IsReminder { get; set; }
         public bool IsTrash { get; set; }
         public virtual User User { get; set; }
+        public ICollection<Lable> lables { get; set; }
 
 
     }

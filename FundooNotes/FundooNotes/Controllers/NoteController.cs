@@ -12,8 +12,9 @@ using System.Threading.Tasks;
 
 namespace FundooNotes.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("[controller]")]
+   
     public class NoteController : ControllerBase
     {
         INoteBL noteBL;
@@ -107,7 +108,7 @@ namespace FundooNotes.Controllers
             {
                 var userid = User.Claims.FirstOrDefault(x => x.Type.ToString().Equals("UserId", StringComparison.InvariantCultureIgnoreCase));
                 int UserId = Int32.Parse(userid.Value);
-                var result = await this.noteBL.ArchieveNote( NoteId, UserId);
+                var result = await this.noteBL.ArchieveNote(NoteId, UserId);
                 return this.Ok(new { success = true, message = $"Note Archieved successfully!!!", data = result });
             }
             catch (Exception ex)

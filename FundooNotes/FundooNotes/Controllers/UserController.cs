@@ -49,8 +49,6 @@ namespace FundooNotes.Controllers
         {
             try
             {
-
-
                 var result = this.userBL.LoginUser(email, password);
                 if (result != null)
                 {
@@ -58,10 +56,11 @@ namespace FundooNotes.Controllers
                     {
                         success = true,
                         message = $"Login Successful " +
-                        $" token:  {result}"
-                    });
+                       $" token:  {result}"
+                    });                                       
 
                 }
+
                 return this.BadRequest(new { success = false, message = $"Login Failed" });
 
             }

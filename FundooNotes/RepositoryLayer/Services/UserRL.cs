@@ -49,7 +49,7 @@ namespace RepositoryLayer.User
         {
             try
             {
-                var result = fundoo.Users.Where(u => u.email == email && u.password == password).FirstOrDefault();
+                var result = fundoo.Users.Where(u => u.email == email && u.password == EncryptPassword(password)).FirstOrDefault();
                 if (result == null)
                 {
                     return null;

@@ -19,5 +19,8 @@ namespace RepositoryLayer.Entity
 
         public string password { get; set; }
         public string address { get; set; }
+
+        public ICollection<Lable> lables { get; set; }
+
     }
 }
