@@ -21,7 +21,8 @@ namespace RepositoryLayer.Interfaces
         Task<Note> ChangeColor(int noteId, int userId, string newColor);
 
         Task<List<Note>> GetAllNote(int userId);
-
+         Task<List<Note>> GetAllNotes_ByRadisCache();
+        
 
     }
 }

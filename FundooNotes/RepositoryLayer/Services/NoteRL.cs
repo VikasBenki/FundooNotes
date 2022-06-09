@@ -178,9 +178,13 @@ namespace RepositoryLayer.Services
                     {
                         res.IsTrash = true;
                     }
-                    if (res.IsTrash == true)
+                    else if (res.IsTrash == true)
                     {
                         res.IsTrash = false;
+                    }
+                    else
+                    {
+                        res = null;
                     }
                     await fundoo.SaveChangesAsync();
                     return await fundoo.Notes.Where(a => a.NoteId == noteId).FirstOrDefaultAsync();
@@ -222,6 +226,18 @@ namespace RepositoryLayer.Services
             try
             {
                 return await fundoo.Notes.Where(u => u.UserId == userId).Include(u => u.User).ToListAsync();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public async Task<List<Note>> GetAllNotes_ByRadisCache()
+        {
+            try
+            {
+                return await fundoo.Notes.ToListAsync();
             }
             catch (Exception e)
             {

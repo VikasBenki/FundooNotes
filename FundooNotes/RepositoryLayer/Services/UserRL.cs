@@ -1,5 +1,6 @@
 ﻿using CommonLayer;
 using Experimental.System.Messaging;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using RepositoryLayer.FundooNotesContext;
@@ -205,7 +206,7 @@ namespace RepositoryLayer.User
                 {
                     new Claim("Email",email)
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddHours(3),
                 SigningCredentials =
                 new SigningCredentials(
                     new SymmetricSecurityKey(tokenKey),
@@ -222,7 +223,7 @@ namespace RepositoryLayer.User
                 if (valid.password.Equals(valid.ConfirmPassword))
                 {
                     var user = fundoo.Users.Where(x => x.email == email).FirstOrDefault();
-                    user.password = valid.ConfirmPassword;
+                    user.password = EncryptPassword(valid.ConfirmPassword);
                     fundoo.SaveChanges();
                     return true;
                 }
@@ -234,6 +235,18 @@ namespace RepositoryLayer.User
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+        public List<Entity.User> GetAllUsers()
+        {
+            try
+            {
+                var result = fundoo.Users.Include(u => u.lables).ToList();
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw e;
             }
         }
 

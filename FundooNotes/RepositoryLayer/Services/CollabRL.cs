@@ -92,6 +92,18 @@ namespace RepositoryLayer.Services
             }
 
         }
+        public async Task<List<Collaborator>> GetCollaboratorByRedisCache()
+        {
+            try
+            {
+                List<Collaborator> result = await fundoo.Collabrators.ToListAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
 
     }
 }

@@ -109,6 +109,19 @@ namespace RepositoryLayer.Services
             }
         }
 
+        public async Task<List<Lable>> GetlabelByRedisCache()
+        {
+            try
+            {
+                List<Lable> reuslt = await fundoo.Lables.ToListAsync();
+                return reuslt;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
     }
 }
 

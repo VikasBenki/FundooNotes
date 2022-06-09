@@ -128,6 +128,20 @@ namespace BusinessLayer.Services
                 throw ex;
             }
         }
+
+        public async Task<List<Note>> GetAllNotes_ByRadisCache()
+        {
+            try
+            {
+                return await this.noteRL.GetAllNotes_ByRadisCache();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
     }
 }
 

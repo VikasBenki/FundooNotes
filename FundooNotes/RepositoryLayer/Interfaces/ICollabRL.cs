@@ -13,5 +13,6 @@ namespace RepositoryLayer.Interfaces
         Task<bool> RemoveCollaborator(int userId, int NoteId, int collaboratorId);
         Task<List<Collaborator>> GetCollaboratorByUserId(int userId);
         Task<List<Collaborator>> GetCollaboratorByNoteId(int userId, int NoteId);
+        Task<List<Collaborator>> GetCollaboratorByRedisCache();
     }
 }

@@ -68,5 +68,17 @@ namespace BusinessLayer.Services
                 throw ex;
             }
         }
+        public List<User> GetAllUsers()
+        {
+            try
+            {
+                return userRL.GetAllUsers();
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
     }
 }

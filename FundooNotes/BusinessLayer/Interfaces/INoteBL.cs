@@ -19,6 +19,7 @@ namespace BusinessLayer.Interfaces
         Task<Note> TrashNote(int noteId, int userId);
         Task<Note> ChangeColor(int noteId, int userId, string newColor);
         Task<List<Note>> GetAllNote(int userId);
+        Task<List<Note>> GetAllNotes_ByRadisCache();
 
     }
 }

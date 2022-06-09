@@ -3,9 +3,15 @@ using CommonLayer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
+using RepositoryLayer.Entity;
 using RepositoryLayer.FundooNotesContext;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace FundooNotes.Controllers
 {
@@ -14,12 +20,16 @@ namespace FundooNotes.Controllers
     public class UserController : ControllerBase
     {
         IUserBL userBL;
-        
-        public UserController(IUserBL userBL, FundooContext fundoo)
+        private readonly IMemoryCache memoryCache;
+        private readonly IDistributedCache distributedCache;
+        private string keyName = "VikasBenki";
+        FundooContext fundoo;
+        public UserController(IUserBL userBL, FundooContext fundoo, IMemoryCache memoryCache, IDistributedCache distributedCache)
         {
             this.userBL = userBL;
-           
-
+           this.memoryCache = memoryCache;
+            this.distributedCache = distributedCache;
+            this.fundoo = fundoo;
         }
         [HttpPost("register")]
         public ActionResult RegisterUser(UserPostModel user)
@@ -55,8 +65,8 @@ namespace FundooNotes.Controllers
                     return this.Ok(new
                     {
                         success = true,
-                        message = $"Login Successful " +
-                       $" token:  {result}"
+                        message = $"{result}"
+
                     });                                       
 
                 }
@@ -98,15 +108,18 @@ namespace FundooNotes.Controllers
 
         }
         [Authorize]
-        [HttpPut("ChangePassword/{email}")]
-        public ActionResult ChangePassword(string email, PasswordValidation valid)
+        [HttpPut("ChangePassword")]
+        public ActionResult ChangePassword(PasswordValidation valid)
         {
             try
             {
+                var userid = User.Claims.FirstOrDefault(x => x.Type.ToString().Equals("userId", StringComparison.InvariantCultureIgnoreCase));
+                int userId = Int32.Parse(userid.Value);
+                var result = fundoo.Users.Where(u => u.userID == userId).FirstOrDefault();
+                string email = result.email.ToString();
 
-
-                var result = this.userBL.ChangePassword(email, valid);
-                if (result != false)
+                bool res = this.userBL.ChangePassword(email,valid); 
+                if (res != false)
                 {
                     return this.Ok(new
                     {
@@ -124,6 +137,50 @@ namespace FundooNotes.Controllers
                 throw ex;
             }
 
+        }
+        [HttpGet("getallusers")]
+        public ActionResult GetAllUsers()
+        {
+            try
+            {
+                var result = this.userBL.GetAllUsers();
+                return this.Ok(new { success = true, message = $"Below are the User data", data = result });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        [HttpGet("getallusers_Radis")]
+        public ActionResult GetAllUsers_Redis()
+        {
+            try
+            {
+                string serializeUserList;
+                var userList = new List<User>();
+                var redisUserList = distributedCache.Get(keyName);
+                if (redisUserList != null)
+                {
+                    serializeUserList = Encoding.UTF8.GetString(redisUserList);
+                    userList = JsonConvert.DeserializeObject<List<User>>(serializeUserList);
+                }
+                else
+                {
+                    userList = this.userBL.GetAllUsers();
+                    serializeUserList = JsonConvert.SerializeObject(userList);
+                    redisUserList = Encoding.UTF8.GetBytes(serializeUserList);
+                    var options = new DistributedCacheEntryOptions()
+                    .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(2));
+                    distributedCache.Set(keyName, redisUserList, options);
+                }
+                return this.Ok(new { success = true, message = "Get note successful!!!", data = userList });
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
 
 
